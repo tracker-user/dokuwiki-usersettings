@@ -1,0 +1,7 @@
+base   usersettings
+author TrackerUser
+email  -
+date   2026-05-22
+name   User Settings
+desc   Per-user preference toggles with a self-service settings page and an admin overview
+url    https://github.com/tracker-user/dokuwiki-usersettings

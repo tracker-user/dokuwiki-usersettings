@@ -1,0 +1,91 @@
+/*
+ * User Settings plugin styles.
+ *
+ * Deliberately simple selectors only — no :has(), :not(), :is(),
+ * aspect-ratio, container queries or CSS nesting — so the stylesheet works
+ * in older browsers (Firefox 78 ESR). Colours use DokuWiki's standard
+ * style.ini replacement tokens, so the plugin follows light and dark
+ * templates automatically.
+ */
+
+/* ---- settings page + admin edit form -------------------------------- */
+
+.plugin_usersettings .us-intro {
+    margin: 0 0 1.2em;
+    color: __text_alt__;
+}
+
+.plugin_usersettings .us-form {
+    max-width: 40em;
+}
+
+.plugin_usersettings .us-row {
+    margin: 0 0 1em;
+    padding: 0 0 1em;
+    border-bottom: 1px solid __border__;
+}
+
+.plugin_usersettings .us-label {
+    display: block;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.plugin_usersettings .us-label input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+
+.plugin_usersettings .us-row-select .us-name {
+    display: block;
+    margin-bottom: 0.35em;
+}
+
+.plugin_usersettings .us-row-select select {
+    min-width: 18em;
+    max-width: 100%;
+    font-weight: normal;
+}
+
+.plugin_usersettings .us-desc {
+    margin-top: 0.35em;
+    font-size: 90%;
+    color: __text_alt__;
+}
+
+.plugin_usersettings .us-actions {
+    margin-top: 1.2em;
+}
+
+.plugin_usersettings .us-back {
+    margin-left: 1em;
+}
+
+/* ---- admin overview table ------------------------------------------- */
+
+.plugin_usersettings_admin .us-filter {
+    margin: 0 0 1em;
+    padding: 0.5em 0.7em;
+    background-color: __background_alt__;
+    border: 1px solid __border__;
+}
+
+.plugin_usersettings_admin .us-filter select {
+    margin: 0 0.4em;
+}
+
+.plugin_usersettings_table {
+    width: 100%;
+}
+
+.plugin_usersettings_table th a {
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.plugin_usersettings_table tr.us-default-row td {
+    color: __text_alt__;
+}
+
+.plugin_usersettings_table .us-default-mark {
+    font-style: italic;
+}
