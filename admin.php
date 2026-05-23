@@ -403,7 +403,7 @@ class admin_plugin_usersettings extends DokuWiki_Admin_Plugin
     {
         global $auth, $ID;
 
-        $html = '<div class="plugin_usersettings_admin">';
+        $html = '<div class="plugin_usersettings_admin plugin_usersettings">';
 
         $userData = ($auth !== null) ? $auth->getUserData($user) : false;
         if ($userData === false) {
