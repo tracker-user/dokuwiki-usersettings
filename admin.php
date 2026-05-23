@@ -42,7 +42,7 @@ class admin_plugin_usersettings extends DokuWiki_Admin_Plugin
     /** Position in the admin menu. */
     public function getMenuSort()
     {
-        return 350;
+        return 1000;
     }
 
     /** Admin menu label — distinct from the user menu's "Preferences". */
