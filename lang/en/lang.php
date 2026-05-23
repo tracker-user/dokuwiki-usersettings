@@ -35,3 +35,7 @@ $lang['adminsaved']     = 'Preferences for %s have been saved.';
 $lang['adminsavefail']  = 'Preferences could not be saved.';
 $lang['badidentuser']   = 'Unknown user.';
 $lang['nousers']        = 'No users found.';
+
+// built-in interface language preference
+$lang['lang_label']     = 'Interface language';
+$lang['lang_desc']      = 'The language used for DokuWiki\'s menus and messages. Overrides the site default for your account only.';

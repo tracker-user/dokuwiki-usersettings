@@ -33,6 +33,29 @@ class action_plugin_usersettings extends DokuWiki_Action_Plugin
         $controller->register_hook('MENU_ITEMS_ASSEMBLY', 'AFTER', $this, 'handleMenuAssembly');
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handlePreprocess');
         $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE', $this, 'handleUnknown');
+
+        // Register the built-in interface language toggle.
+        $controller->register_hook(
+            helper_plugin_usersettings::REGISTER_EVENT,
+            'BEFORE',
+            $this,
+            'registerLangToggle'
+        );
+
+        // Apply the user's language choice as early as possible so that all
+        // DokuWiki rendering — including TPL_ hooks further down the chain —
+        // uses the right language strings.  ACTION_ACT_PREPROCESS fires before
+        // any output is produced and before template rendering begins.
+        $controller->register_hook(
+            'ACTION_ACT_PREPROCESS',
+            'BEFORE',
+            $this,
+            'applyUserLang',
+            null,
+            // run at priority -10 so we fire before handlePreprocess (0) and
+            // before anything else that might read $conf['lang']
+            -10
+        );
     }
 
     /**
@@ -237,6 +260,129 @@ class action_plugin_usersettings extends DokuWiki_Action_Plugin
 
         return $html . '</div>';
     }
+
+    // ---------------------------------------------------------------------
+    //  Built-in: interface language toggle
+    // ---------------------------------------------------------------------
+
+    /**
+     * Contribute the "Interface language" select to the usersettings registry.
+     *
+     * The option list is built by scanning DOKU_INC/inc/lang/ for sub-
+     * directories that contain a lang.php file — the same source the
+     * Configuration Manager uses for its own language drop-down.  The scan
+     * result is sorted alphabetically by language code; the site default is
+     * used as the toggle's default value so the toggle appears pre-selected
+     * correctly for users who have never changed it.
+     *
+     * @param Doku_Event $event PLUGIN_USERSETTINGS_REGISTER
+     * @param mixed       $param
+     */
+    public function registerLangToggle(Doku_Event $event, $param)
+    {
+        global $conf;
+
+        $options = $this->getAvailableLanguages();
+        if (empty($options)) {
+            return; // nothing to register if we cannot list languages
+        }
+
+        $siteDefault = $conf['lang'] ?? 'en';
+        if (!array_key_exists($siteDefault, $options)) {
+            $siteDefault = array_key_first($options);
+        }
+
+        $event->data[] = [
+            'key'     => 'lang',
+            'label'   => $this->getLang('lang_label'),
+            'desc'    => $this->getLang('lang_desc'),
+            'type'    => 'select',
+            'options' => $options,
+            'default' => $siteDefault,
+            'plugin'  => 'usersettings',
+        ];
+    }
+
+    /**
+     * Build the [code => display name] map of all installed DokuWiki interface
+     * languages by scanning inc/lang/.  The display name is the language code
+     * itself (e.g. "en", "de", "fr") — consistent with how the Configuration
+     * Manager presents the option.
+     *
+     * @return array  [langCode => langCode]  sorted by language code
+     */
+    protected function getAvailableLanguages()
+    {
+        $pattern = DOKU_INC . 'inc/lang/*/lang.php';
+        $files   = glob($pattern);
+        if ($files === false || empty($files)) {
+            return [];
+        }
+
+        $langs = [];
+        foreach ($files as $file) {
+            $code = basename(dirname($file)); // e.g. "de" from ".../inc/lang/de/lang.php"
+            if ($code === '' || $code === '.' || $code === '..') {
+                continue;
+            }
+            $langs[$code] = $code;
+        }
+
+        ksort($langs, SORT_STRING);
+        return $langs;
+    }
+
+    /**
+     * Apply the logged-in user's preferred interface language, overriding the
+     * site-wide $conf['lang'] before any rendering takes place.
+     *
+     * DokuWiki loads language strings lazily (via getLang() / $lang global
+     * reloads triggered by calls to init_lang()), so changing $conf['lang']
+     * here — in the earliest ACTION_ACT_PREPROCESS handler — is sufficient
+     * to affect all subsequent output.
+     *
+     * No-op for anonymous visitors or when the user has not chosen a language
+     * that differs from the site default.
+     *
+     * @param Doku_Event $event ACTION_ACT_PREPROCESS
+     * @param mixed       $param
+     */
+    public function applyUserLang(Doku_Event $event, $param)
+    {
+        global $conf, $INPUT;
+
+        $user = $INPUT->server->str('REMOTE_USER');
+        if ($user === '') {
+            return; // anonymous — use the site default
+        }
+
+        $helper = $this->getHelper();
+        if ($helper === null) {
+            return;
+        }
+
+        $preferred = $helper->getPreference('lang', $user);
+        if ($preferred === null || $preferred === '' || $preferred === $conf['lang']) {
+            return; // no preference stored or already correct
+        }
+
+        // Validate: only apply if the directory actually exists to avoid a
+        // broken page when someone stores a stale language code.
+        $langDir = DOKU_INC . 'inc/lang/' . $preferred;
+        if (!is_dir($langDir)) {
+            return;
+        }
+
+        $conf['lang'] = $preferred;
+
+        // Re-initialise the global $lang array so immediately-following
+        // getLang() calls within this request pick up the new language.
+        init_lang($preferred);
+    }
+
+    // ---------------------------------------------------------------------
+    //  Form rendering (shared between action and admin)
+    // ---------------------------------------------------------------------
 
     /**
      * Render one toggle as a form row. Public so the admin component can

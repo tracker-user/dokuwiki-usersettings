@@ -110,6 +110,27 @@ first registration wins.
 A toggle definition is plain data, so a **template** can have a toggle too —
 ship a tiny companion action plugin that does nothing but register it.
 
+## Built-in toggles
+
+### Interface language
+
+This plugin ships with a built-in **Interface language** toggle that allows
+each logged-in user to select their preferred language for DokuWiki's menus
+and messages, overriding the site-wide default (`$conf['lang']`).
+
+- **Key:** `lang`
+- **Type:** `select`
+- **Options:** All installed languages found in `inc/lang/`
+- **Default:** The site's configured default language
+
+The language preference is applied as early as possible in the request
+lifecycle (during `ACTION_ACT_PREPROCESS`), so all rendering — template hooks,
+plugins, the wiki text itself — sees the user's chosen language immediately.
+
+Users can change it in the Preferences page. Admins can set it per-user in the
+User Settings admin table. The language list is scanned from the same source
+as DokuWiki's Configuration Manager.
+
 ## Reading a preference
 
 Your plugin reads the effective value through the helper. `getPreference()`
@@ -130,7 +151,7 @@ User Settings plugin is not installed.
 | File | Role |
 | --- | --- |
 | `helper.php` | Storage, the registration event, the read/write API. |
-| `action.php` | The user-menu item and the `do=usersettings` settings page. |
+| `action.php` | The user-menu item, the `do=usersettings` settings page, and the built-in interface language toggle. |
 | `admin.php` | The admin overview table and per-user edit form. |
 | `MenuItem.php` | The user-menu item class. |
 
@@ -143,6 +164,12 @@ Manager → Manual Install. There is nothing to configure.
 
 - The settings page and admin pages are plain HTML forms — no JavaScript — so
   there are no old-browser concerns.
+- The **built-in interface language toggle** is registered automatically by
+  `action.php` and requires no configuration. It scans `inc/lang/` at
+  registration time to populate the option list, so all installed languages
+  are immediately available to users. The toggle applies the selected language
+  during `ACTION_ACT_PREPROCESS`, before any output is produced, ensuring
+  consistency throughout the request.
 - This is a new, locally-developed plugin with no upstream, so — unlike the
   forked plugins on this wiki — it carries no update-suppression date.
 
