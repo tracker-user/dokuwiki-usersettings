@@ -160,6 +160,10 @@ User Settings plugin is not installed.
 Drop the folder into `lib/plugins/usersettings/`, or use Admin → Extension
 Manager → Manual Install. There is nothing to configure.
 
+## Translations
+
+Included: English (`en`), German (`de`), Russian (`ru`), Japanese (`ja`).
+
 ## Notes
 
 - The settings page and admin pages are plain HTML forms — no JavaScript — so

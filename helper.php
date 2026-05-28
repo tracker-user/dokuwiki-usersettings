@@ -308,7 +308,7 @@ class helper_plugin_usersettings extends DokuWiki_Plugin
             return true; // nothing to write — treated as success
         }
 
-        $ok = io_saveFile($file, json_encode($data, JSON_PRETTY_PRINT));
+        $ok = io_saveFile($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         io_unlock($file);
         return (bool) $ok;
     }

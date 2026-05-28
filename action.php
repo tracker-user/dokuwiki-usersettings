@@ -378,6 +378,13 @@ class action_plugin_usersettings extends DokuWiki_Action_Plugin
         // Re-initialise the global $lang array so immediately-following
         // getLang() calls within this request pick up the new language.
         init_lang($preferred);
+
+        // The PLUGIN_USERSETTINGS_REGISTER event fired during getPreference()
+        // above caused this action plugin's own locale to load under the old
+        // $conf['lang'].  Reset the cache so subsequent getLang() calls on
+        // this instance (e.g. renderSettingsPage) load the user's language.
+        $this->localised = false;
+        $this->lang = [];
     }
 
     // ---------------------------------------------------------------------

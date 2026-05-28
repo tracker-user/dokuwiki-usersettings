@@ -32,7 +32,7 @@ $lang['bydefault']      = '(default)';
 $lang['edit_heading']   = 'Edit preferences for %s';
 $lang['edit_back']      = 'Back to overview';
 $lang['adminsaved']     = 'Preferences for %s have been saved.';
-$lang['adminsavefail']  = 'Preferences could not be saved.';
+$lang['adminsavefail']  = 'Preferences for %s could not be saved.';
 $lang['badidentuser']   = 'Unknown user.';
 $lang['nousers']        = 'No users found.';
 
